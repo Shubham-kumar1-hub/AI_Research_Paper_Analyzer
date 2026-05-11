@@ -1,12 +1,12 @@
 import os
-import dotenv as load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
 class settings:
     PROJECT_NAME: str = "AI Research Paper Analyzer"
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY")
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "llama3-70b-8192")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
 
     UPLOAD_DIR: str = "temp_uploaded_pdfs"
     if not os.path.exists(UPLOAD_DIR):

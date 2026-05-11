@@ -51,7 +51,7 @@ def get_llm_analysis(paper_text: str, analysis_type: str, model_name: str = sett
     Args:
         paper_text: The full text of the research paper.
         analysis_type: Type of analysis ("summary", "critical_analysis", "gaps", "suggestions").
-        model_name: The LLM model to use (e.g., "llama3-70b-8192").
+        model_name: The LLM model to use (e.g., "llama-3.3-70b-versatile").
         streamlit_status_placeholder: Optional Streamlit container for status updates.
 
     Returns:
