@@ -1,14 +1,16 @@
-# AI Research Paper Analyzer
+# AI Research Paper Analyzer with RAG
 
 AI Research Paper Analyzer is a simple AI-powered web application that helps users analyze research papers in PDF format.
 
-The user can upload a research paper and generate:
-- Summary
-- Critical Analysis
-- Research Gaps
-- Suggestions for Future Research
+The project allows users to:
+- Upload research papers in PDF format
+- Generate summaries
+- Perform critical analysis
+- Identify research gaps
+- Generate future research suggestions
+- Chat with the uploaded research paper using RAG (Retrieval-Augmented Generation)
 
-This project is built using Python, Streamlit, PyMuPDF, and Groq LLM.
+This project is built using Python, Streamlit, PyMuPDF, Groq LLM, Sentence Transformers, and FAISS Vector Database.
 
 ---
 
@@ -16,12 +18,16 @@ This project is built using Python, Streamlit, PyMuPDF, and Groq LLM.
 
 - Upload PDF research papers
 - Extract text from PDF files
-- Generate AI-based summaries
-- Perform critical analysis
-- Identify research gaps
-- Generate future research suggestions
+- AI-generated summaries
+- Critical analysis generation
+- Research gap identification
+- Suggestions for future research
+- RAG-based semantic retrieval
+- Chat with research paper
+- FAISS vector database integration
+- Embedding generation using Sentence Transformers
 - Handles large PDFs using chunking
-- Simple and easy-to-use Streamlit UI
+- Simple Streamlit UI
 
 ---
 
@@ -31,9 +37,11 @@ This project is built using Python, Streamlit, PyMuPDF, and Groq LLM.
 - Streamlit
 - PyMuPDF
 - Groq API
-- Llama 3 Model
+- Llama 3
+- Sentence Transformers
+- FAISS
+- NumPy
 - python-dotenv
-- Logging
 
 ---
 
@@ -43,25 +51,29 @@ This project is built using Python, Streamlit, PyMuPDF, and Groq LLM.
 AI_Research_Paper_Analyzer/
 │
 ├── app.py
-│   └── Main Streamlit application file
+│   └── Main Streamlit application
 │
 ├── config.py
-│   └── Stores project configurations and environment variables
+│   └── Stores configurations and environment variables
 │
 ├── pdf_utils.py
-│   └── Handles PDF text extraction
+│   └── Handles PDF parsing and text extraction
 │
 ├── llm_utils.py
-│   └── Handles chunking and AI analysis using Groq LLM
+│   └── Handles LLM analysis and question answering
+│
+├── rag_utils.py
+│   └── Handles chunking, embeddings, vector database,
+│       and semantic retrieval
 │
 ├── requirements.txt
 │   └── Required Python libraries
 │
 ├── .env
-│   └── Stores Groq API key and model name
+│   └── Stores API keys and model settings
 │
 └── temp_uploaded_pdfs/
-    └── Temporary folder for uploaded PDFs
+    └── Temporary uploaded PDF storage
 ```
 
 ---
@@ -69,20 +81,41 @@ AI_Research_Paper_Analyzer/
 # Project Workflow
 
 ```text
-User uploads PDF
-        ↓
-PDF is saved temporarily
-        ↓
-Text is extracted from PDF
-        ↓
-Extracted text is split into chunks
-        ↓
-Chunks are sent to Groq LLM
-        ↓
-AI generates analysis
-        ↓
-Results are displayed on Streamlit UI
+Upload PDF
+    ↓
+Extract Text from PDF
+    ↓
+Split Text into Chunks
+    ↓
+Generate Embeddings
+    ↓
+Store Embeddings in FAISS Vector DB
+    ↓
+Semantic Retrieval
+    ↓
+Send Relevant Chunks to Groq LLM
+    ↓
+Generate AI Response
 ```
+
+---
+
+# RAG Workflow
+
+The project now uses RAG (Retrieval-Augmented Generation).
+
+Instead of sending the entire PDF to the LLM, the system:
+1. Splits the PDF into chunks
+2. Creates embeddings
+3. Stores embeddings in FAISS vector database
+4. Retrieves only the most relevant chunks
+5. Sends relevant chunks to the LLM
+
+This improves:
+- Response accuracy
+- Speed
+- Token efficiency
+- Context relevance
 
 ---
 
@@ -90,139 +123,83 @@ Results are displayed on Streamlit UI
 
 ## 1. app.py
 
-This is the main file of the project.
+Main Streamlit application file.
 
 Responsibilities:
-- Creates Streamlit web interface
-- Uploads PDF files
-- Handles user interaction
-- Displays progress and results
-- Calls PDF extraction functions
-- Calls AI analysis functions
-
-Main functions:
-- Upload PDF
-- Select analysis type
-- Run AI analysis
-- Display results
+- Handles UI
+- Uploads PDFs
+- Runs analysis
+- Creates RAG pipeline
+- Handles Chat with PDF
+- Displays results
 
 ---
 
 ## 2. config.py
 
-This file contains all project settings.
-
-It loads environment variables using:
-
-```python
-load_dotenv()
-```
-
-Main settings:
-- Project name
-- Groq API key
-- LLM model name
-- Upload folder
-- Chunk size
+Stores:
+- API keys
+- Model names
+- Chunk sizes
 - Analysis options
-
-Example:
-
-```python
-ANALYSIS_OPTIONS = {
-    "summary": "Generate a concise summary of the research paper.",
-    "critical_analysis": "critical Analysis",
-    "gaps": "Research Gaps",
-    "suggestions": "Suggestions for Future Research",
-}
-```
+- Upload directory
 
 ---
 
 ## 3. pdf_utils.py
 
-This file handles PDF parsing and text extraction.
+Handles:
+- PDF parsing
+- Text extraction
+- PDF validation
+- PDF error handling
 
 Main library used:
-
 ```python
 import fitz
-```
-
-Main function:
-
-```python
-extract_text_from_pdf()
-```
-
-Responsibilities:
-- Check if PDF exists
-- Open PDF
-- Extract text from pages
-- Combine extracted text
-- Handle PDF parsing errors
-
-Custom Exception:
-
-```python
-PDFParsingError
 ```
 
 ---
 
 ## 4. llm_utils.py
 
-This file handles AI analysis using Groq API.
-
-Main responsibilities:
-- Split large text into chunks
-- Send chunks to LLM
-- Generate AI analysis
-- Handle retries and API errors
+Handles:
+- Groq API calls
+- AI analysis generation
+- Prompt engineering
+- Chat with PDF answers
 
 Main functions:
-
-```python
-split_text_into_chunks()
-```
-
 ```python
 get_llm_analysis()
 ```
 
-Supported analysis types:
-- Summary
-- Critical Analysis
-- Research Gaps
-- Suggestions
+```python
+ask_question_about_paper()
+```
 
 ---
 
-# Why Chunking is Used
+## 5. rag_utils.py
 
-Research papers are usually very large.
+Handles:
+- Text chunking
+- Embedding generation
+- FAISS vector database
+- Semantic retrieval
 
-LLMs cannot process extremely large text at once because of token limits.
-
-So the extracted text is divided into smaller chunks.
-
-Example:
-
-```text
-Full PDF Text
-    ↓
-Chunk 1
-Chunk 2
-Chunk 3
+Main libraries:
+```python
+SentenceTransformer
+faiss
+numpy
 ```
-
-Each chunk is analyzed separately by the AI model.
 
 ---
 
 # Installation Steps
 
-## 1. Clone the Repository
+## 1. Clone Repository
 
 ```bash
 git clone https://github.com/Shubham-kumar1-hub/AI_Research_Paper_Analyzer.git
@@ -230,7 +207,7 @@ git clone https://github.com/Shubham-kumar1-hub/AI_Research_Paper_Analyzer.git
 
 ---
 
-## 2. Move to the Project Folder
+## 2. Move to Project Folder
 
 ```bash
 cd AI_Research_Paper_Analyzer
@@ -274,122 +251,116 @@ pip install -r requirements.txt
 
 Create a `.env` file inside the project folder.
 
-Add the following variables:
+Add:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
 LLM_MODEL=llama-3.3-70b-versatile
 ```
 
-Replace:
-
-```env
-your_groq_api_key
-```
-
-with your actual Groq API key.
-
 ---
 
 # Run the Project
-
-Run the Streamlit application using:
 
 ```bash
 streamlit run app.py
 ```
 
-After running the command, the application will open in your browser.
-
 ---
 
 # How to Use
 
-1. Open the application in browser
-2. Upload a PDF research paper
-3. Select analysis type from sidebar
-4. Click on "Analyze Paper"
-5. Wait for processing
-6. View generated analysis
+1. Upload a PDF research paper
+2. Select analysis types
+3. Click "Analyze Paper"
+4. View AI-generated analysis
+5. Ask questions using Chat With Research Paper feature
 
 ---
 
 # Analysis Types
 
-## 1. Summary
-
-Generates a concise summary of the research paper.
-
----
-
-## 2. Critical Analysis
-
-Analyzes strengths, weaknesses, methodology, and contribution.
+- Summary
+- Critical Analysis
+- Research Gaps
+- Suggestions for Future Research
 
 ---
 
-## 3. Research Gaps
+# Chat With Research Paper
 
-Identifies missing areas and possible gaps in research.
+The project supports semantic question answering using RAG.
+
+Example questions:
+- What dataset was used?
+- What methodology was used?
+- What are the limitations?
+- What are the future improvements?
+
+The system retrieves relevant chunks from the vector database before sending them to the LLM.
 
 ---
 
-## 4. Suggestions
+# Dependencies
 
-Provides suggestions for future research and improvements.
+Main dependencies used:
 
----
-
-# Error Handling
-
-The project handles:
-- Missing PDF files
-- Empty PDFs
-- API errors
-- Invalid analysis types
-- Empty AI responses
-
-Custom exceptions used:
-
-```python
-PDFParsingError
-LLMAnalysisError
+```txt
+streamlit
+PyMuPDF
+python-dotenv
+groq==0.11.0
+httpx==0.27.2
+sentence-transformers
+faiss-cpu
+numpy
 ```
-
----
-
-# Limitations
-
-- Scanned PDFs may not work properly
-- Large PDFs take more processing time
-- Internet connection is required
-- Groq API key is required
-- AI output may not always be fully accurate
 
 ---
 
 # Future Improvements
 
 Possible future improvements:
-- Add OCR support
-- Export results as PDF or DOCX
-- Add database support
-- Add user authentication
-- Add multiple PDF upload support
-- Improve UI design
-- Add citation generation
+- OCR support for scanned PDFs
+- Citation generation
+- Multi-document analysis
+- Research paper comparison
+- Export analysis as PDF/DOCX
+- Cloud deployment
+- Research recommendation system
+
+---
+
+# Limitations
+
+- Scanned PDFs may not work properly
+- Large PDFs may take more processing time
+- Internet connection is required
+- API key is required
+- AI responses may not always be fully accurate
 
 ---
 
 # Conclusion
 
-AI Research Paper Analyzer helps students and researchers quickly understand research papers using AI.
+AI Research Paper Analyzer with RAG is a beginner-friendly GenAI project that combines:
+- PDF processing
+- Vector databases
+- Embeddings
+- Semantic search
+- Large Language Models
 
-The project extracts text from PDFs and generates different types of AI-based analysis using Groq LLM.
+The project helped in understanding:
+- RAG architecture
+- Chunking
+- Vector databases
+- Embeddings
+- Semantic retrieval
+- LLM integration
+- Streamlit application development
 
-This project was developed as a learning-based AI application using:
-- Python
-- Streamlit
-- PyMuPDF
-- Groq API
-- Llama 3 Model
+---
+
+# GitHub Repository
+
+https://github.com/Shubham-kumar1-hub/AI_Research_Paper_Analyzer
