@@ -17,6 +17,7 @@ class settings:
         "critical_analysis": " critical Analysis",
         "gaps": " Research Gaps",
         "suggestions": "Suggestions for Future Research",
+        "chat": "Chat With Research Paper"
     }
 
     # Target characters per chunk. ~4 chars/token. Aim for ~4000-5000 tokens per chunk payload.

@@ -44,6 +44,45 @@ def split_text_into_chunks(text: str, target_char_count: int = settings.CHUNK_TA
         start = split_point - overlap_char_count if split_point - overlap_char_count > start else split_point
     return chunks
 
+
+def ask_question_about_paper(
+
+    context,
+
+    question,
+
+    model_name=settings.LLM_MODEL
+):
+
+    prompt = f"""
+    Answer the question using only the provided context.
+
+    Context:
+    {context}
+
+    Question:
+    {question}
+    """
+
+    response = client.chat.completions.create(
+        model=model_name,
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful AI Research Assistant"
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2,
+        max_tokens=1000
+    )
+
+    return response.choices[0].message.content
+
+
 def get_llm_analysis(paper_text: str, analysis_type: str, model_name: str = settings.LLM_MODEL, streamlit_status_placeholder=None) -> str:
     """
     Performs a specified analysis on the paper text using Groq LLM, processing in chunks if necessary.
